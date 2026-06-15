@@ -13,12 +13,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy via FTP
+      - name: Deploy via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: 82.25.106.218
           username: u277663530
           password: AlphaNodus@79
+          protocol: ftps
+          port: 21
           server-dir: /home/u277663530/domains/blueprove.com/public_html/cafeconnects/
           exclude: |
             **/.git*
