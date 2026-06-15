@@ -13,16 +13,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: 82.25.106.218
-          username: u277663530
-          password: AlphaNodus@79
-          protocol: ftps
-          port: 21
-          server-dir: /home/u277663530/domains/blueprove.com/public_html/cafeconnects/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
+      - name: Install lftp
+        run: sudo apt-get install -y lftp
+
+      - name: List remote directories (debug)
+        run: |
+          lftp -c "
+          set ftp:ssl-allow yes;
+          set ssl:verify-certificate no;
+          set net:timeout 30;
+          open -u u277663530,AlphaNodus@79 ftps://82.25.106.218;
+          ls /home/u277663530/domains/;
+          bye
+          "
+
+      - name: Deploy files via FTPS
+        run: |
+          lftp -c "
+          set ftp:ssl-allow yes;
+          set ssl:verify-certificate no;
+          set net:timeout 30;
+          set net:max-retries 3;
+          open -u u277663530,AlphaNodus@79 ftps://82.25.106.218;
+          mirror -R --delete --verbose --exclude=.git/ --exclude=.github/ . /home/u277663530/domains/blueprove.com/public_html/cafeconnects/;
+          bye
+          "
